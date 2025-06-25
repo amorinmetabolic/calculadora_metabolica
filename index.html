@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATP NutriCalc: Calculadora Científica Metabólica</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-dna"></i> ATP NutriCalc</h1>
+            <p>Calculadora Científica Metabólica</p>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="#calculadora" class="active"><i class="fas fa-calculator"></i> Calculadora</a></li>
+                <li><a href="#acerca-de"><i class="fas fa-info-circle"></i> Acerca de</a></li>
+                <li><a href="#metodologia"><i class="fas fa-book"></i> Metodología</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            <section id="calculadora" class="card">
+                <h2>Calculadora de ATP</h2>
+                
+                <div class="search-section">
+                    <h3>Búsqueda de Alimento</h3>
+                    <div class="input-group">
+                        <input type="text" id="food-search" placeholder="Ej: Apple, Chicken Breast, Brown Rice">
+                        <button id="search-btn" class="btn primary"><i class="fas fa-search"></i> Buscar Alimento en ingles</button>
+                    </div>
+                    <div id="search-results" class="hidden">
+                        <!-- Resultados de búsqueda se mostrarán aquí -->
+                    </div>
+                </div>
+
+                <div class="food-data-section">
+                    <h3>Datos del Alimento</h3>
+                    <div class="selected-food-info hidden" id="selected-food-info">
+                        <p>Alimento seleccionado: <span id="selected-food-name">Ninguno</span></p>
+                    </div>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="food-quantity">Cantidad (g):</label>
+                            <input type="number" id="food-quantity" min="0" value="100">
+                        </div>
+                    </div>
+                    
+                    <div class="macros-grid">
+                        <div class="input-group">
+                            <label for="carbs">Carbohidratos (g):</label>
+                            <input type="number" id="carbs" min="0" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="fats">Grasas (g):</label>
+                            <input type="number" id="fats" min="0" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="proteins">Proteínas (g):</label>
+                            <input type="number" id="proteins" min="0" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="fiber">Fibra (g):</label>
+                            <input type="number" id="fiber" min="0" step="0.1">
+                        </div>
+                    </div>
+                    
+                    <button id="calculate-btn" class="btn primary"><i class="fas fa-bolt"></i> Calcular ATP</button>
+                </div>
+
+                <div class="personal-data-section">
+                    <h3>Datos Personales (Opcional)</h3>
+                    <div class="personal-data-toggle">
+                        <input type="checkbox" id="show-personal-data">
+                        <label for="show-personal-data">Incluir datos personales para cálculos personalizados</label>
+                    </div>
+                    
+                    <div id="personal-data-fields" class="hidden">
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label>Género:</label>
+                                <div class="radio-group">
+                                    <input type="radio" id="gender-male" name="gender" value="male">
+                                    <label for="gender-male">Masculino</label>
+                                    <input type="radio" id="gender-female" name="gender" value="female">
+                                    <label for="gender-female">Femenino</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="age">Edad:</label>
+                                <input type="number" id="age" min="0" max="120">
+                            </div>
+                            <div class="input-group">
+                                <label for="weight">Peso (kg):</label>
+                                <input type="number" id="weight" min="0" step="0.1">
+                            </div>
+                            <div class="input-group">
+                                <label for="height">Altura (cm):</label>
+                                <input type="number" id="height" min="0">
+                            </div>
+                        </div>
+                        
+                        <button id="calculate-bmr-btn" class="btn secondary"><i class="fas fa-heartbeat"></i> Estimar Tasa Metabólica Basal</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="results" class="card hidden">
+                <h2>Resultados</h2>
+                <div class="results-container">
+                    <div class="result-item">
+                        <h3>ATP Total Estimado</h3>
+                        <div class="result-value" id="atp-total">-</div>
+                        <div class="result-unit">moles</div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h3>Equivalente Energético</h3>
+                        <div class="result-value" id="energy-kj">-</div>
+                        <div class="result-unit">kJ</div>
+                        <div class="result-value" id="energy-kcal">-</div>
+                        <div class="result-unit">kcal</div>
+                    </div>
+                </div>
+                
+                <div class="atp-breakdown">
+                    <h3>Desglose por Macronutriente</h3>
+                    <div class="breakdown-container">
+                        <div class="breakdown-item">
+                            <div class="nutrient-label">Carbohidratos</div>
+                            <div class="nutrient-bar">
+                                <div class="bar-fill carbs" id="carbs-bar"></div>
+                            </div>
+                            <div class="nutrient-value" id="carbs-atp">-</div>
+                        </div>
+                        
+                        <div class="breakdown-item">
+                            <div class="nutrient-label">Grasas</div>
+                            <div class="nutrient-bar">
+                                <div class="bar-fill fats" id="fats-bar"></div>
+                            </div>
+                            <div class="nutrient-value" id="fats-atp">-</div>
+                        </div>
+                        
+                        <div class="breakdown-item">
+                            <div class="nutrient-label">Proteínas</div>
+                            <div class="nutrient-bar">
+                                <div class="bar-fill proteins" id="proteins-bar"></div>
+                            </div>
+                            <div class="nutrient-value" id="proteins-atp">-</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="notes-section">
+                    <h3>Notas Importantes</h3>
+                    <ul>
+                        <li>La fibra no digerible no contribuye a la producción de ATP.</li>
+                        <li>Los cálculos consideran una eficacia respiratoria óptima.</li>
+                        <li>La producción real de ATP puede variar según factores individuales.</li>
+                    </ul>
+                </div>
+                
+                <div id="bmr-results" class="hidden">
+                    <h3>Tasa Metabólica Basal</h3>
+                    <div class="result-value" id="bmr-value">-</div>
+                    <div class="result-unit">kcal/día</div>
+                    <p>Esta es la energía que tu cuerpo necesita en reposo.</p>
+                </div>
+            </section>
+
+            <section id="acerca-de" class="card">
+                <h2>Acerca de ATP NutriCalc</h2>
+                <p>ATP NutriCalc es una calculadora científica metabólica diseñada para estimar con precisión la generación de ATP (trifosfato de adenosina) a partir de alimentos completos, considerando las rutas metabólicas reales y la degradación de los nutrientes hasta CO₂ y H₂O o metabolitos residuales.</p>
+                
+                <p>A diferencia de las calculadoras tradicionales de calorías que utilizan los valores Atwater, ATP NutriCalc se enfoca en la Energía Neta Metabolizable (NME) basada en la producción real de ATP, ofreciendo una visión más precisa del valor energético de los alimentos para el cuerpo humano.</p>
+                
+                <p>Esta herramienta está dirigida principalmente a profesionales de la salud, nutricionistas, investigadores y estudiantes interesados en comprender mejor el metabolismo energético humano.</p>
+            </section>
+
+            <section id="metodologia" class="card">
+                <h2>Metodología</h2>
+                <p>ATP NutriCalc utiliza modelos bioquímicos avanzados para estimar la producción de ATP a partir de los macronutrientes de los alimentos:</p>
+                
+                <h3>Carbohidratos</h3>
+                <p>Para la glucosa, se considera la ruta completa: glucólisis + ciclo de Krebs + fosforilación oxidativa, que produce aproximadamente 30-32 ATP por mol de glucosa, o aproximadamente 1.2 kcal de ATP por gramo.</p>
+                
+                <h3>Grasas</h3>
+                <p>Para los ácidos grasos, se considera la beta-oxidación + ciclo de Krebs + fosforilación oxidativa. Por ejemplo, el ácido palmítico (C16) produce aproximadamente 106 ATP por mol, o aproximadamente 2.8 kcal de ATP por gramo.</p>
+                
+                <h3>Proteínas</h3>
+                <p>Para las proteínas, se considera la desaminación + ciclo de Krebs + fosforilación oxidativa, con ajustes para el costo energético de la síntesis de urea. Esto resulta en aproximadamente 1.0 kcal de ATP por gramo.</p>
+                
+                <p>Los datos nutricionales se obtienen de la base de datos USDA FoodData Central, que proporciona información detallada sobre la composición de miles de alimentos.</p>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 ATP NutriCalc. Todos los derechos reservados.</p>
+            <p>Datos nutricionales proporcionados por <a href="https://fdc.nal.usda.gov/" target="_blank">USDA FoodData Central</a>.</p>
+            <div class="social-links">
+                <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-linkedin"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
