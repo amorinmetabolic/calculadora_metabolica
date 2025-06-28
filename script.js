@@ -24,6 +24,7 @@ const DOM = {
     searchResults: document.getElementById('search-results'),
     selectedFoodInfo: document.getElementById('selected-food-info'),
     selectedFoodName: document.getElementById('selected-food-name'),
+    selectedFoodCalories: document.getElementById('selected-food-calories'),
     
     // Campos de datos del alimento
     foodQuantity: document.getElementById('food-quantity'),
@@ -65,6 +66,13 @@ const DOM = {
 let appState = {
     selectedFood: null,
     lastCalculation: null,
+    originalNutrients: {
+        carbs: 0,
+        fats: 0,
+        proteins: 0,
+        fiber: 0,
+        calories: 0
+    }
 };
 
 // Inicialización de la aplicación
@@ -200,6 +208,7 @@ function selectFood(food) {
     let fatsValue = 0;
     let proteinsValue = 0;
     let fiberValue = 0;
+    let caloriesValue = 0;
     
     // Mapeo de IDs de nutrientes de USDA FoodData Central
     // Estos IDs pueden variar, se deben ajustar según la documentación actual de la API
@@ -223,13 +232,33 @@ function selectFood(food) {
         else if (nutrientId === 1079) {
             fiberValue = value;
         }
+        // Energía (kcal)
+        else if (nutrientId === 1008) {
+            caloriesValue = value;
+        }
     });
+    
+    // Si no se encontraron calorías en la API, calcular aproximadamente
+    if (caloriesValue === 0) {
+        // Usar el método Atwater para estimar calorías: 4 kcal/g para carbohidratos y proteínas, 9 kcal/g para grasas
+        caloriesValue = (carbsValue * 4) + (proteinsValue * 4) + (fatsValue * 9);
+    }
+    
+    // Guardar los valores originales (por 100g) en el estado
+    appState.originalNutrients = {
+        carbs: carbsValue,
+        fats: fatsValue,
+        proteins: proteinsValue,
+        fiber: fiberValue,
+        calories: caloriesValue
+    };
     
     // Actualizar campos de nutrientes
     DOM.carbs.value = carbsValue;
     DOM.fats.value = fatsValue;
     DOM.proteins.value = proteinsValue;
     DOM.fiber.value = fiberValue;
+    DOM.selectedFoodCalories.textContent = caloriesValue.toFixed(1);
     
     // Ocultar resultados de búsqueda
     DOM.searchResults.classList.add('hidden');
@@ -244,11 +273,12 @@ function updateNutrientValues() {
     const quantity = parseFloat(DOM.foodQuantity.value) || 0;
     const ratio = quantity / 100; // Los valores nutricionales son por 100g
     
-    // Actualizar campos con los valores escalados
-    DOM.carbs.value = (parseFloat(DOM.carbs.value) * ratio).toFixed(1);
-    DOM.fats.value = (parseFloat(DOM.fats.value) * ratio).toFixed(1);
-    DOM.proteins.value = (parseFloat(DOM.proteins.value) * ratio).toFixed(1);
-    DOM.fiber.value = (parseFloat(DOM.fiber.value) * ratio).toFixed(1);
+    // Usar los valores originales para calcular los valores escalados
+    DOM.carbs.value = (appState.originalNutrients.carbs * ratio).toFixed(1);
+    DOM.fats.value = (appState.originalNutrients.fats * ratio).toFixed(1);
+    DOM.proteins.value = (appState.originalNutrients.proteins * ratio).toFixed(1);
+    DOM.fiber.value = (appState.originalNutrients.fiber * ratio).toFixed(1);
+    DOM.selectedFoodCalories.textContent = (appState.originalNutrients.calories * ratio).toFixed(1);
 }
 
 // Calcular ATP a partir de los macronutrientes
